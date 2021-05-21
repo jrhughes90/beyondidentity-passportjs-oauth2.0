@@ -29,15 +29,11 @@ router.get('/callback', function (req, res, next) {
 });
 
 // Perform session logout and redirect to homepage
-router.get('/logout', (req, res) => {
-  req.logout();
-
-  var returnTo = req.protocol + '://' + req.hostname;
-  var port = req.connection.localPort;
-  if (port !== undefined && port !== 80 && port !== 443) {
-    returnTo += ':' + port;
-  }
-
+router.get('/logout', function(req, res) {
+  req.session.destroy(function(e){
+      req.logout();
+      res.redirect('/');
+  });
 });
 
 module.exports = router;
