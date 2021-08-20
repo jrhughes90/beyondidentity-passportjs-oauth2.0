@@ -23,12 +23,25 @@ var strategy = new OAuth2Strategy(
   callbackURL: process.env.APP_ORIGIN + "/callback"
   },
   function (accessToken, refreshToken, extraParams, profile, done) {
-    console.log(accessToken);
-    console.log(refreshToken);
     console.log(extraParams);
+    profile.idtoken = extraParams.id_token;
+    profile.accessToken = accessToken;
     return done(null, profile);
   }
 );
+
+strategy.userProfile = function (accesstoken, done) {
+  this._oauth2._request("GET", "https://auth.byndid.com/v2/userinfo", null, null, accesstoken, (err, data) => {
+    if (err) { return done(err); }
+    try {
+        data = JSON.parse( data );
+    }
+    catch(e) {
+      return done(e);
+    }
+    done(null, data);
+  });
+};
 
 passport.use(strategy);
 
